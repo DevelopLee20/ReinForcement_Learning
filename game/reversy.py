@@ -54,8 +54,8 @@ class Reversy():
         self.able = []
         for i in range(8):
             for j in range(8):
-                if self.find_next(i+1,j,6,False) + self.find_next(i-1,j,4,False) + self.find_next(i,j-1,2,False) + self.find_next(i,j+1,8,False) + self.find_next(i+1,j-1,3,False) + self.find_next(i-1,j+1,7,False) + self.find_next(i-1,j-1,1,False) + self.find_next(i+1,j+1,9,False):
-                    if self.map[i][j] == -1:
+                if self.map[i][j] == -1:
+                    if self.find_next(i+1,j,6,False) + self.find_next(i-1,j,4,False) + self.find_next(i,j-1,2,False) + self.find_next(i,j+1,8,False) + self.find_next(i+1,j-1,3,False) + self.find_next(i-1,j+1,7,False) + self.find_next(i-1,j-1,1,False) + self.find_next(i+1,j+1,9,False):
                         self.able.append([i,j])
                     
         if len(self.able) == 0:
