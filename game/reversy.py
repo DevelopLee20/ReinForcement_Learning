@@ -1,4 +1,19 @@
 '''
+Reversy() : 리버시(오델로) 게임
+'''
+'''
+1. print_field : 게임 보드 출력
+2. able_list : 수를 둘 수 있는 위치 체크
+3. end checker : 게임 끝을 확인
+4. find_next : 
+5. put_mark
+6. reverse
+7. count_score
+8. print_log
+9. print_result
+10. game_start : 게임 시작
+'''
+'''
 기능 1 : 리버시 환경 출력
 기능 2 : 리버시 환경 기본 세팅
 기능 3 : 둘 수 있는 경우의 수 출력
@@ -30,6 +45,7 @@ class Reversy():
         self.able = None
         self.checker = False
         self.end = True
+        self.score = [0,0]
 
     def print_field(self):
         print("x\\y  0   1   2   3   4   5   6   7")
@@ -161,31 +177,38 @@ class Reversy():
                         self.map[x-i][y-i] = (self.turn % 2)
             
     def count_score(self):
-        score = [0,0]
+        self.score = [0,0]
         
         for i in range(8):
             for j in range(8):
                 if self.map[i][j] < 0:
                     continue
-                score[self.map[i][j]] += 1
+                self.score[self.map[i][j]] += 1
                 
         print("  X     O")
-        print("%3d : %3d" % (score[0], score[1]))
+        print("%3d : %3d" % (self.score[0], self.score[1]))
     
     def print_log(self):
         for i,j in self.log:
             print(f"[{i},{j}] ",end="")
-    
-if __name__ == '__main__':
-    game = Reversy()
-    game.able_list()
-    
-    while game.end:
-        game.print_field()
-        game.count_score()
-        
-        x, y = map(int, input("x y: ").split())
-        game.put_mark(x,y)
-        game.able_list()
-        
-    game.count_score()
+            
+    def print_result(self):
+        self.count_score()
+        print('\n===============')
+        print(f'O : {self.score[1]}')
+        print(f'X : {self.score[0]}')
+        if self.score[0] > self.score[1]:
+            print('winner : X')
+        else:
+            print('Winner : O')
+            
+    def game_start(self):
+        self.able_list()
+        while self.end:
+            self.print_field()
+            self.count_score()
+            x, y = map(int, input("x y: ").split())
+            self.put_mark(x,y)
+            self.able_list()
+            
+        self.print_result()
