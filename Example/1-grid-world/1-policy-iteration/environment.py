@@ -4,16 +4,23 @@ import time
 import numpy as np
 from PIL import ImageTk, Image
 
+'''
+Tk 인터페이스 설정
+PhotoImage에 Tk객체 인스턴스화
+TRANSITION_PROB가 뭔지 모르겠다 -> 전이 확률
+'''
 PhotoImage = ImageTk.PhotoImage
-UNIT = 100  # 픽셀 수
-HEIGHT = 5  # 그리드월드 세로
-WIDTH = 5  # 그리드월드 가로
-TRANSITION_PROB = 1
-POSSIBLE_ACTIONS = [0, 1, 2, 3]  # 좌, 우, 상, 하
-ACTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # 좌표로 나타낸 행동
-REWARDS = []
+UNIT = 100                                      # 픽셀 수
+HEIGHT = 5                                      # 그리드월드 세로
+WIDTH = 5                                       # 그리드월드 가로
+TRANSITION_PROB = 1                             # 전이 확률
+POSSIBLE_ACTIONS = [0, 1, 2, 3]                 # 좌, 우, 상, 하
+ACTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]    # 좌표로 나타낸 행동
+REWARDS = []                                    # 보상 리스트
 
-
+'''
+tk 객체 상속
+'''
 class GraphicDisplay(tk.Tk):
     def __init__(self, agent):
         super(GraphicDisplay, self).__init__()
@@ -33,28 +40,20 @@ class GraphicDisplay(tk.Tk):
         self.text_reward(2, 1, "R : -1.0")
 
     def _build_canvas(self):
-        canvas = tk.Canvas(self, bg='white',
-                           height=HEIGHT * UNIT,
-                           width=WIDTH * UNIT)
+        canvas = tk.Canvas(self, bg='white', height=HEIGHT * UNIT, width=WIDTH * UNIT)
         # 버튼 초기화
-        iteration_button = Button(self, text="Evaluate",
-                                  command=self.evaluate_policy)
+        iteration_button = Button(self, text="Evaluate", command=self.evaluate_policy)
         iteration_button.configure(width=10, activebackground="#33B5E5")
-        canvas.create_window(WIDTH * UNIT * 0.13, HEIGHT * UNIT + 10,
-                             window=iteration_button)
-        policy_button = Button(self, text="Improve",
-                               command=self.improve_policy)
+        canvas.create_window(WIDTH * UNIT * 0.13, HEIGHT * UNIT + 10, window=iteration_button)
+        policy_button = Button(self, text="Improve", command=self.improve_policy)
         policy_button.configure(width=10, activebackground="#33B5E5")
-        canvas.create_window(WIDTH * UNIT * 0.37, HEIGHT * UNIT + 10,
-                             window=policy_button)
+        canvas.create_window(WIDTH * UNIT * 0.37, HEIGHT * UNIT + 10, window=policy_button)
         policy_button = Button(self, text="move", command=self.move_by_policy)
         policy_button.configure(width=10, activebackground="#33B5E5")
-        canvas.create_window(WIDTH * UNIT * 0.62, HEIGHT * UNIT + 10,
-                             window=policy_button)
+        canvas.create_window(WIDTH * UNIT * 0.62, HEIGHT * UNIT + 10, window=policy_button)
         policy_button = Button(self, text="reset", command=self.reset)
         policy_button.configure(width=10, activebackground="#33B5E5")
-        canvas.create_window(WIDTH * UNIT * 0.87, HEIGHT * UNIT + 10,
-                             window=policy_button)
+        canvas.create_window(WIDTH * UNIT * 0.87, HEIGHT * UNIT + 10, window=policy_button)
 
         # 그리드 생성
         for col in range(0, WIDTH * UNIT, UNIT):  # 0~400 by 80
@@ -84,6 +83,9 @@ class GraphicDisplay(tk.Tk):
         circle = PhotoImage(Image.open("../img/circle.png").resize((65, 65)))
         return (up, down, left, right), (rectangle, triangle, circle)
 
+    '''
+    reset 버튼 클릭시 실행
+    '''
     def reset(self):
         if self.is_moving == 0:
             self.evaluation_count = 0
@@ -100,22 +102,18 @@ class GraphicDisplay(tk.Tk):
             x, y = self.canvas.coords(self.rectangle)
             self.canvas.move(self.rectangle, UNIT / 2 - x, UNIT / 2 - y)
 
-    def text_value(self, row, col, contents, font='Helvetica', size=10,
-                   style='normal', anchor="nw"):
+    def text_value(self, row, col, contents, font='Helvetica', size=10, style='normal', anchor="nw"):
         origin_x, origin_y = 85, 70
         x, y = origin_y + (UNIT * col), origin_x + (UNIT * row)
         font = (font, str(size), style)
-        text = self.canvas.create_text(x, y, fill="black", text=contents,
-                                       font=font, anchor=anchor)
+        text = self.canvas.create_text(x, y, fill="black", text=contents, font=font, anchor=anchor)
         return self.texts.append(text)
 
-    def text_reward(self, row, col, contents, font='Helvetica', size=10,
-                    style='normal', anchor="nw"):
+    def text_reward(self, row, col, contents, font='Helvetica', size=10, style='normal', anchor="nw"):
         origin_x, origin_y = 5, 5
         x, y = origin_y + (UNIT * col), origin_x + (UNIT * row)
         font = (font, str(size), style)
-        text = self.canvas.create_text(x, y, fill="black", text=contents,
-                                       font=font, anchor=anchor)
+        text = self.canvas.create_text(x, y, fill="black", text=contents, font=font, anchor=anchor)
         return self.texts.append(text)
 
     def rectangle_move(self, action):
@@ -139,6 +137,9 @@ class GraphicDisplay(tk.Tk):
         y = (temp[1] / 100) - 0.5
         return int(y), int(x)
 
+    '''
+    move 버튼 클릭시 실행
+    '''
     def move_by_policy(self):
         if self.improvement_count != 0 and self.is_moving != 1:
             self.is_moving = 1
@@ -148,8 +149,7 @@ class GraphicDisplay(tk.Tk):
 
             x, y = self.find_rectangle()
             while len(self.agent.policy_table[x][y]) != 0:
-                self.after(100,
-                           self.rectangle_move(self.agent.get_action([x, y])))
+                self.after(100, self.rectangle_move(self.agent.get_action([x, y])))
                 x, y = self.find_rectangle()
             self.is_moving = 0
 
@@ -159,20 +159,16 @@ class GraphicDisplay(tk.Tk):
 
         if policy[0] > 0:  # up
             origin_x, origin_y = 50 + (UNIT * row), 10 + (UNIT * col)
-            self.arrows.append(self.canvas.create_image(origin_x, origin_y,
-                                                        image=self.up))
+            self.arrows.append(self.canvas.create_image(origin_x, origin_y, image=self.up))
         if policy[1] > 0:  # down
             origin_x, origin_y = 50 + (UNIT * row), 90 + (UNIT * col)
-            self.arrows.append(self.canvas.create_image(origin_x, origin_y,
-                                                        image=self.down))
+            self.arrows.append(self.canvas.create_image(origin_x, origin_y, image=self.down))
         if policy[2] > 0:  # left
             origin_x, origin_y = 10 + (UNIT * row), 50 + (UNIT * col)
-            self.arrows.append(self.canvas.create_image(origin_x, origin_y,
-                                                        image=self.left))
+            self.arrows.append(self.canvas.create_image(origin_x, origin_y, image=self.left))
         if policy[3] > 0:  # right
             origin_x, origin_y = 90 + (UNIT * row), 50 + (UNIT * col)
-            self.arrows.append(self.canvas.create_image(origin_x, origin_y,
-                                                        image=self.right))
+            self.arrows.append(self.canvas.create_image(origin_x, origin_y, image=self.right))
 
     def draw_from_policy(self, policy_table):
         for i in range(HEIGHT):
@@ -189,6 +185,12 @@ class GraphicDisplay(tk.Tk):
         self.canvas.tag_raise(self.rectangle)
         self.update()
 
+    '''Evaluate 버튼 클릭시 실행
+    1. evaluation_count 1 증가
+    2. texts 하나씩 canvas.delete 실행
+    3. agent.policy_evaluation 실행
+    4. print_value_table(agent.value_table) 실행
+    '''
     def evaluate_policy(self):
         self.evaluation_count += 1
         for i in self.texts:
@@ -196,13 +198,15 @@ class GraphicDisplay(tk.Tk):
         self.agent.policy_evaluation()
         self.print_value_table(self.agent.value_table)
 
+    '''
+    Improve 버튼 클릭시 실행
+    '''
     def improve_policy(self):
         self.improvement_count += 1
         for i in self.arrows:
             self.canvas.delete(i)
         self.agent.policy_improvement()
         self.draw_from_policy(self.agent.policy_table)
-
 
 class Env:
     def __init__(self):
@@ -229,12 +233,11 @@ class Env:
         action = ACTIONS[action_index]
         return self.check_boundary([state[0] + action[0], state[1] + action[1]])
 
+    # self 인자가 없는 메소드
     @staticmethod
     def check_boundary(state):
-        state[0] = (0 if state[0] < 0 else WIDTH - 1
-                    if state[0] > WIDTH - 1 else state[0])
-        state[1] = (0 if state[1] < 0 else HEIGHT - 1
-                    if state[1] > HEIGHT - 1 else state[1])
+        state[0] = (0 if state[0] < 0 else WIDTH - 1 if state[0] > WIDTH - 1 else state[0])
+        state[1] = (0 if state[1] < 0 else HEIGHT - 1 if state[1] > HEIGHT - 1 else state[1])
         return state
 
     def get_transition_prob(self, state, action):
